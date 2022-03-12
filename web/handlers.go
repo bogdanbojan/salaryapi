@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+
 	"strconv"
 )
 
@@ -16,7 +17,6 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 	handleOtherRequestMethods(w, r)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("Creating something.."))
-
 }
 
 func handleOtherRequestMethods(w http.ResponseWriter, r *http.Request) {
