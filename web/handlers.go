@@ -2,31 +2,46 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 
 	"strconv"
 )
 
 func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
-	handleOtherRequestMethods(w, r)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("Creating something.."))
+	if handleOtherThanGET(w, r) {
+		return
+	}
+	handleQuery(w, r.URL.RawQuery)
 
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("hm"))
 }
 
 func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
-	handleOtherRequestMethods(w, r)
+	if handleOtherThanGET(w, r) {
+		return
+	}
+	handleQuery(w, r.URL.RawQuery)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte("Creating something.."))
 }
 
-func handleOtherRequestMethods(w http.ResponseWriter, r *http.Request) {
+func handleOtherThanGET(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != "GET" {
 		w.Header().Set("Allow", "GET")
-		w.Header().Set("Content-Type", "application/json")
 		http.Error(w, "Method Not Allowed", 405)
+		return true
+	}
+	return false
+}
+
+func handleQuery(w http.ResponseWriter, rq string) {
+	q, _ := url.ParseQuery(rq)
+	if _, ok := q["pay-day"]; len(q) > 1 || !ok {
+		w.Write([]byte("Invalid query"))
 		return
 	}
-	return
 }
 
 func verifyPayDate(w http.ResponseWriter, r *http.Request) {
