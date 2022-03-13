@@ -59,7 +59,7 @@ func whenSalaryMonth(day int) (int, string) {
 		salaryDate = Date(y, m+1, day)
 	}
 
-	switch salaryDate.Day() {
+	switch salaryDate.Weekday() {
 	case 0:
 		salaryDate = Date(y, m, day+5)
 	case 6:
@@ -73,7 +73,7 @@ func whenSalaryMonth(day int) (int, string) {
 
 func whenSalaryYearHelper(salaryDate time.Time) string {
 	y, m, d := salaryDate.Date()
-	switch salaryDate.Day() {
+	switch salaryDate.Weekday() {
 	case 0:
 		salaryDate = Date(y, m, d+5)
 	case 6:
@@ -84,7 +84,6 @@ func whenSalaryYearHelper(salaryDate time.Time) string {
 
 }
 
-// TODO: year return not working properly
 func whenSalaryYear(day int) []string {
 	y, m, d := time.Now().Date()
 	currentDate := Date(y, m, d)
@@ -100,8 +99,6 @@ func whenSalaryYear(day int) []string {
 		salaryDate = Date(y, m, day)
 		date := whenSalaryYearHelper(salaryDate)
 		salariesDates = append(salariesDates, date)
-
-		//currentDate = Date(y, m+1, d)
 	}
 
 	return salariesDates
