@@ -14,11 +14,15 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
 		days, date := whenSalaryMonth(pd)
-		w.Write([]byte("You have " + strconv.Itoa(days) + " more days till your payday."))
-		w.Write([]byte("Paydate: " + date))
-
+		m := Monthly{
+			NrOfDays: days,
+			Date:     date,
+		}
+		err := app.writeJSON(w, http.StatusOK, m, nil)
+		if err != nil {
+			app.serverError(w, err)
+		}
 	default:
 		w.Header().Set("Allow", "GET")
 		http.Error(w, "Method Not Allowed", 405)
@@ -33,11 +37,13 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
 		dates := whenSalaryYear(pd)
-		for _, date := range dates {
-			w.Write([]byte(date))
-			w.Write([]byte("\n"))
+		y := Yearly{
+			Dates: dates,
+		}
+		err := app.writeJSON(w, http.StatusOK, y, nil)
+		if err != nil {
+			app.serverError(w, err)
 		}
 	default:
 		w.Header().Set("Allow", "GET")
@@ -68,8 +74,10 @@ func whenSalaryYear(payDay int) []string {
 //}
 
 // check if there are multiple queries as well - should it be invalidated?
+// check if it's bigger then the last day of the month, not 31.
 func getPayDate(w http.ResponseWriter, r *http.Request) (int, bool) {
 	pd, err := strconv.Atoi(r.URL.Query().Get("pay-day"))
+
 	if err != nil || pd < 1 || pd > 31 {
 		http.NotFound(w, r)
 		return 0, false
@@ -79,7 +87,6 @@ func getPayDate(w http.ResponseWriter, r *http.Request) (int, bool) {
 
 func Date(year int, month time.Month, day int) time.Time {
 	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-
 }
 
 func getAPIDates(payDay int) (currentDate time.Time, salaryDate time.Time) {
@@ -99,7 +106,7 @@ func getYearlySalaryDates(salaryDate time.Time) []string {
 	for m = salaryDate.Month(); m <= 12; m++ {
 		salaryDate = Date(y, m, d)
 		salaryDate = checkWeekday(salaryDate)
-		salaryDates = append(salaryDates, salaryDate.Format(time.RFC850[:18]))
+		salaryDates = append(salaryDates, salaryDate.Format(time.RFC850[:17]))
 	}
 
 	return salaryDates
@@ -122,6 +129,5 @@ func checkWeekday(salaryDate time.Time) time.Time {
 	case 6:
 		salaryDate = Date(y, m, d+6)
 	}
-
 	return salaryDate
 }
