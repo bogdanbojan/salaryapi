@@ -2,15 +2,14 @@ package main
 
 import (
 	"net/http"
-	"time"
-
 	"strconv"
+	"time"
 )
 
 func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		pd, ok := getPayDate(w, r)
+		pd, ok := app.getPayDate(w, r)
 		if !ok {
 			return
 		}
@@ -25,7 +24,7 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 		}
 	default:
 		w.Header().Set("Allow", "GET")
-		http.Error(w, "Method Not Allowed", 405)
+		app.clientError(w, 405)
 	}
 
 }
@@ -33,7 +32,7 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		pd, ok := getPayDate(w, r)
+		pd, ok := app.getPayDate(w, r)
 		if !ok {
 			return
 		}
@@ -47,7 +46,7 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 		}
 	default:
 		w.Header().Set("Allow", "GET")
-		http.Error(w, "Method Not Allowed", 405)
+		app.clientError(w, 405)
 	}
 }
 
@@ -75,11 +74,11 @@ func whenSalaryYear(payDay int) []string {
 
 // check if there are multiple queries as well - should it be invalidated?
 // check if it's bigger then the last day of the month, not 31.
-func getPayDate(w http.ResponseWriter, r *http.Request) (int, bool) {
+func (app *application) getPayDate(w http.ResponseWriter, r *http.Request) (int, bool) {
 	pd, err := strconv.Atoi(r.URL.Query().Get("pay-day"))
 
 	if err != nil || pd < 1 || pd > 31 {
-		http.NotFound(w, r)
+		app.clientError(w, 400)
 		return 0, false
 	}
 	return pd, true
