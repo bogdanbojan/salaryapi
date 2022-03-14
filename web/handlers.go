@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+const (
+	Year = iota
+	Month
+)
+
 func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -13,12 +18,8 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			return
 		}
-		days, date := whenSalaryMonth(pd)
-		m := Monthly{
-			NrOfDays: days,
-			Date:     date,
-		}
-		err := app.writeJSON(w, http.StatusOK, m, nil)
+		data := app.getResponseData(pd, Month)
+		err := app.writeJSON(w, http.StatusOK, data, nil)
 		if err != nil {
 			app.serverError(w, err)
 		}
@@ -36,11 +37,8 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			return
 		}
-		dates := whenSalaryYear(pd)
-		y := Yearly{
-			Dates: dates,
-		}
-		err := app.writeJSON(w, http.StatusOK, y, nil)
+		data := app.getResponseData(pd, Year)
+		err := app.writeJSON(w, http.StatusOK, data, nil)
 		if err != nil {
 			app.serverError(w, err)
 		}
@@ -48,6 +46,25 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Allow", "GET")
 		app.clientError(w, 405)
 	}
+}
+
+func (app *application) getResponseData(payDate int, period int) (data interface{}) {
+	switch period {
+	case Year:
+		dates := whenSalaryYear(payDate)
+		y := Yearly{
+			Dates: dates,
+		}
+		return y
+	case Month:
+		days, date := whenSalaryMonth(payDate)
+		m := Monthly{
+			NrOfDays: days,
+			Date:     date,
+		}
+		return m
+	}
+	return struct{}{}
 }
 
 func whenSalaryMonth(payDay int) (int, string) {
