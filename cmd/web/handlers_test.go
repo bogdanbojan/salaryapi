@@ -14,7 +14,7 @@ func TestHowMuch(t *testing.T) {
 	}
 	for i, urc := range URLRequestsCases.howMuchRequests {
 		rr := httptest.NewRecorder() // ?
-		r, err := http.NewRequest("GET", urc, nil)
+		r, err := http.NewRequest(URLRequestsCases.methodRequests[i], urc, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -59,20 +59,30 @@ func assertStatusCode(t testing.TB, got, want int) {
 }
 
 var URLRequestsCases = struct {
+	methodRequests  []string
 	howMuchRequests []string
 	howManyRequests []string
 }{
+	methodRequests: []string{
+		"GET",
+		"GET",
+		"UPDATE",
+		"GET",
+		"POST",
+	},
 	howMuchRequests: []string{
 		"/salary/how-much?pay-day=20",
 		"/salary/how-much?pay-day=-20",
 		"/salary/how-much?pay-day=40",
 		"/salary/how-much?pay-day=0",
+		"/annual/festival/of/not/working",
 	},
 	howManyRequests: []string{
 		"/salary/list-how-many?pay-day=20",
 		"/salary/list-how-many?pay-day=-20",
 		"/salary/list-how-many?pay-day=40",
 		"/salary/list-how-many?pay-day=0",
+		"/annual/festival/of/not/working",
 	},
 }
 var URLResponsesCases = struct {
@@ -82,14 +92,16 @@ var URLResponsesCases = struct {
 	howMuchResponses: []int{
 		http.StatusOK,
 		http.StatusBadRequest,
+		http.StatusNotFound,
 		http.StatusBadRequest,
-		http.StatusBadRequest,
+		http.StatusNotFound,
 	},
 	howManyResponses: []int{
 		http.StatusOK,
 		http.StatusBadRequest,
+		http.StatusNotFound,
 		http.StatusBadRequest,
-		http.StatusBadRequest,
+		http.StatusNotFound,
 	},
 }
 
@@ -106,8 +118,6 @@ func TestGetPayDate(t *testing.T) {
 		}
 		payDay, flag := app.getPayDay(rr, r)
 		assertPayDayResponse(t, payDay, flag, payDayResponsesCases.payDay[i], payDayResponsesCases.flag[i])
-		rs := rr.Result()
-		assertStatusCode(t, rs.StatusCode, URLResponsesCases.howManyResponses[i])
 	}
 }
 
@@ -134,9 +144,11 @@ var payDayResponsesCases = struct {
 		0,
 		0,
 		0,
+		0,
 	},
 	flag: []bool{
 		true,
+		false,
 		false,
 		false,
 		false,
