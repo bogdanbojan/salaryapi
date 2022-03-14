@@ -114,6 +114,7 @@ func TestGetPayDate(t *testing.T) {
 	}
 }
 
+// tuple? Pair struct{a,b interface{}}
 func assertPayDayResponse(t testing.TB, gotInt int, gotBool bool, wantInt int, wantBool bool) {
 	t.Helper()
 	if gotInt != wantInt {
