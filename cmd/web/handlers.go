@@ -20,7 +20,7 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 		}
 	default:
 		w.Header().Set("Allow", "GET")
-		app.clientError(w, 404)
+		app.clientError(w, http.StatusMethodNotAllowed)
 	}
 
 }
@@ -39,7 +39,7 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 		}
 	default:
 		w.Header().Set("Allow", "GET")
-		app.clientError(w, 405)
+		app.clientError(w, http.StatusMethodNotAllowed)
 	}
 }
 

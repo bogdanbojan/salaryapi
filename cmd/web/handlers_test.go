@@ -6,12 +6,13 @@ import (
 	"testing"
 )
 
+var app = &application{ // synchronization prob?
+	errorLog: nil,
+	infoLog:  nil,
+}
+
 func TestHowMuch(t *testing.T) {
 	t.Parallel() // ?
-	app := &application{
-		errorLog: nil,
-		infoLog:  nil,
-	}
 	for i, urc := range URLRequestsCases.howMuchRequests {
 		rr := httptest.NewRecorder() // ?
 		r, err := http.NewRequest(URLRequestsCases.methodRequests[i], urc, nil)
@@ -30,17 +31,13 @@ func TestHowMuch(t *testing.T) {
 
 func TestHowMany(t *testing.T) {
 	t.Parallel()
-	app := &application{
-		errorLog: nil,
-		infoLog:  nil,
-	}
 	for i, urc := range URLRequestsCases.howManyRequests {
 		rr := httptest.NewRecorder() // ?
-		r, err := http.NewRequest("GET", urc, nil)
+		r, err := http.NewRequest(URLRequestsCases.methodRequests[i], urc, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
-		app.howMuch(rr, r)
+		app.howMany(rr, r)
 		rs := rr.Result()
 		assertStatusCode(t, rs.StatusCode, URLResponsesCases.howManyResponses[i])
 		err = rs.Body.Close()
@@ -92,24 +89,20 @@ var URLResponsesCases = struct {
 	howMuchResponses: []int{
 		http.StatusOK,
 		http.StatusBadRequest,
-		http.StatusNotFound,
+		http.StatusMethodNotAllowed,
 		http.StatusBadRequest,
-		http.StatusNotFound,
+		http.StatusMethodNotAllowed,
 	},
 	howManyResponses: []int{
 		http.StatusOK,
 		http.StatusBadRequest,
-		http.StatusNotFound,
+		http.StatusMethodNotAllowed,
 		http.StatusBadRequest,
-		http.StatusNotFound,
+		http.StatusMethodNotAllowed,
 	},
 }
 
 func TestGetPayDate(t *testing.T) {
-	app := &application{
-		errorLog: nil,
-		infoLog:  nil,
-	}
 	for i, urc := range URLRequestsCases.howManyRequests {
 		rr := httptest.NewRecorder()
 		r, err := http.NewRequest("GET", urc, nil)
