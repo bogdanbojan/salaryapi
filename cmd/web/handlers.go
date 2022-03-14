@@ -9,7 +9,7 @@ import (
 func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		pd, ok := app.getPayDate(w, r)
+		pd, ok := app.getPayDay(w, r)
 		if !ok {
 			return
 		}
@@ -28,7 +28,7 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		pd, ok := app.getPayDate(w, r)
+		pd, ok := app.getPayDay(w, r)
 		if !ok {
 			return
 		}
@@ -63,7 +63,7 @@ func (app *application) getResponseData(payDate int, period int) (data interface
 }
 
 // check if there are multiple queries as well - should it be invalidated?
-func (app *application) getPayDate(w http.ResponseWriter, r *http.Request) (int, bool) {
+func (app *application) getPayDay(w http.ResponseWriter, r *http.Request) (int, bool) {
 	pd, err := strconv.Atoi(r.URL.Query().Get("pay-day"))
 	y, m, _ := time.Now().Date()
 	lastDayOfMonth := Date(y, m+1, 0).Day()
