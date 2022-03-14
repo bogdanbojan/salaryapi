@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-const (
-	Year = iota
-	Month
-)
-
 func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":

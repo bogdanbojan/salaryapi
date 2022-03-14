@@ -2,6 +2,11 @@ package main
 
 import "time"
 
+const (
+	Year = iota
+	Month
+)
+
 func whenSalaryMonth(payDay int) (int, string) {
 	currentDate, salaryDate := getAPIDates(payDay)
 	salaryDate = checkWeekday(salaryDate)

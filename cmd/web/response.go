@@ -7,12 +7,12 @@ import (
 
 // Monthly and Yearly are the JSON response structs.
 type Monthly struct {
-	NrOfDays int
-	Date     string
+	NrOfDays int    `json:"nr-of-days"`
+	Date     string `json:"date"`
 }
 
 type Yearly struct {
-	Dates []string
+	Dates []string `json:"dates"`
 }
 
 func (app *application) writeJSON(w http.ResponseWriter, status int, data interface{}, headers http.Header) error {
