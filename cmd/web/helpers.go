@@ -7,6 +7,7 @@ const (
 	Month
 )
 
+// whenSalaryMonth is a controller which handles the calculation of the next monthly pay date.
 func whenSalaryMonth(payDay int) (int, string) {
 	currentDate, salaryDate := getAPIDates(payDay)
 	salaryDate = checkWeekday(salaryDate)
@@ -14,6 +15,7 @@ func whenSalaryMonth(payDay int) (int, string) {
 	return daysUntilSalary, salaryDate.Format(time.RFC850[:18])
 }
 
+// whenSalaryYear is a controller which handles the calculation of the next yearly pay dates.
 func whenSalaryYear(payDay int) []string {
 	_, salaryDate := getAPIDates(payDay)
 	salaryDate = checkWeekday(salaryDate)
@@ -21,11 +23,12 @@ func whenSalaryYear(payDay int) []string {
 	return salaryDates
 }
 
+// Date is a factory function that constructs a time.Time value.
 func Date(year int, month time.Month, day int) time.Time {
 	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
 }
 
-// TODO: maybe- inject currentDate. It will look weird in whenSalaryYear
+// getAPIDates returns the next pay date and the current time of your query.
 func getAPIDates(payDay int) (currentDate time.Time, salaryDate time.Time) {
 	y, m, d := time.Now().Date()
 	currentDate = Date(y, m, d)
@@ -56,6 +59,8 @@ func upToDays(currentDate time.Time, salaryDate time.Time) int {
 	return int(days)
 }
 
+// getYearlySalaryDates returns an array of strings with all the dates of
+// your pay date in that year formatted to a RFC850 standard (wo time) - day, dd-mmm-yy
 func getYearlySalaryDates(salaryDate time.Time) []string {
 	var salaryDates []string
 	y, m, d := salaryDate.Date()

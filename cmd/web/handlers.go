@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+// howMuch is the handler for the GET request asking the next salary date and how many days
+// you have until then. It only works with GET requests.
 func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -25,6 +27,8 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// howMuch is the handler for the GET request asking the next salary dates in the
+// current year. It only works with GET requests.
 func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -43,6 +47,7 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getResponseData gets the type of data that needs to be written to the JSON response.
 func (app *application) getResponseData(payDate int, period int) (data interface{}) {
 	switch period {
 	case Year:
@@ -62,7 +67,8 @@ func (app *application) getResponseData(payDate int, period int) (data interface
 	return struct{}{}
 }
 
-// check if there are multiple queries as well - should it be invalidated?
+// getPayDay extracts the pay day from the query. It checks if it is valid and returns a
+// tuple with the pay day and a flag which tells you if the input was valid or not.
 func (app *application) getPayDay(w http.ResponseWriter, r *http.Request) (int, bool) {
 	pd, err := strconv.Atoi(r.URL.Query().Get("pay-day"))
 	y, m, _ := time.Now().Date()

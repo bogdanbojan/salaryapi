@@ -15,6 +15,9 @@ type Yearly struct {
 	Dates []string `json:"dates"`
 }
 
+// writeJSON writes a JSON response to http requests. It can work with multiple data types and can also write a header.
+// The latter one is optional. The for loop is safe since we can range over nil map. Go does not throw an error if you
+// try to range over (or generally, read from) a nil map.
 func (app *application) writeJSON(w http.ResponseWriter, status int, data interface{}, headers http.Header) error {
 	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
