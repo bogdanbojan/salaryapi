@@ -13,6 +13,7 @@ func (app *application) howMuch(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		pd, ok := app.getPayDay(w, r)
 		if !ok {
+			app.clientError(w, 400)
 			return
 		}
 		data := app.getResponseData(pd, Month)
@@ -34,6 +35,7 @@ func (app *application) howMany(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		pd, ok := app.getPayDay(w, r)
 		if !ok {
+			app.clientError(w, 400)
 			return
 		}
 		data := app.getResponseData(pd, Year)
@@ -75,7 +77,6 @@ func (app *application) getPayDay(w http.ResponseWriter, r *http.Request) (int, 
 	lastDayOfMonth := Date(y, m+1, 0).Day()
 
 	if err != nil || pd < 1 || pd > lastDayOfMonth {
-		app.clientError(w, 400)
 		return 0, false
 	}
 	return pd, true
